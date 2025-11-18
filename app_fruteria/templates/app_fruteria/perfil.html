@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | Olivos Verdes</title>
+    {% load static %}
+    <style>
+        body {
+            background-color: #1b120d;
+            color: #fff;
+            font-family: 'Verdana', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #1b120d;
+            padding: 20px;
+            color: #66842f;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        header img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .perfil-card {
+            background-color: #241913;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .perfil-card h2 {
+            color: #ffce73;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        .info-group {
+            border-bottom: 1px solid #333;
+            padding: 10px 0;
+        }
+
+        .info-group strong {
+            display: inline-block;
+            width: 150px;
+            color: #66842f;
+        }
+
+        .info-group span {
+            color: #ddd;
+        }
+
+        .btn-cerrar-sesion {
+            display: block;
+            width: 100%;
+            background-color: #ff4d4d;
+            color: #fff;
+            padding: 12px;
+            margin-top: 30px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .btn-cerrar-sesion:hover {
+            background-color: #e60000;
+        }
+        
+        /* Estilos para el menú de navegación (Hamburguesa) */
+        .hamburger-icon {
+            display: block;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: #66842f;
+        }
+
+        .menu-nav {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #66842f;
+            z-index: 999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .menu-nav.active {
+            transform: translateX(0);
+        }
+
+        .menu-nav ul {
+            list-style: none;
+            padding: 70px 0 0 0;
+            margin: 0;
+        }
+
+        .menu-nav li a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            border-bottom: 1px solid #555;
+        }
+
+        .menu-nav li a:hover {
+            background-color: #555;
+        }
+
+        footer {
+            background-color: #1b120d;
+            color: #aaa;
+            padding: 15px;
+            font-size: 13px;
+            text-align: center;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{% static 'app_fruteria/imagenes/icon.jpg' %}" alt="Logo">
+        Olivos Verdes
+    </header>
+
+    <button id="menu-btn" class="hamburger-icon">☰</button>
+    <nav id="menu" class="menu-nav">
+        <ul>
+            <li><a href="{% url 'inicio' %}">Inicio</a></li>
+            <li><a href="{% url 'menu_virtual' %}">Menú Virtual</a></li>
+            <li><a href="{% url 'ver_ofertas' %}">Ofertas</a></li>
+            <li><a href="{% url 'ver_carrito' %}">Carrito</a></li>
+            <li><a href="{% url 'confirmar_compra' %}">Comprar</a></li>
+            {% if not user.is_authenticated %}
+                <li><a href="{% url 'iniciar_sesion' %}">Iniciar Sesión</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <main>
+        <div class="perfil-card">
+            <h2>Hola, {{ usuario.first_name|default:usuario.username }}</h2>
+            
+            <div class="info-group">
+                <strong>Nombre:</strong> <span>{{ usuario.first_name }}</span>
+            </div>
+            
+            <div class="info-group">
+                <strong>Correo:</strong> <span>{{ usuario.email }}</span>
+            </div>
+            
+            {% if perfil %}
+            <div class="info-group">
+                <strong>Usuario desde:</strong> <span>{{ usuario.date_joined|date:"d M Y" }}</span>
+            </div>
+            
+            <div class="info-group">
+                <strong>Dirección de entrega:</strong> <span>{{ perfil.direccion_entrega }}</span>
+            </div>
+            
+            {% else %}
+            <p style="color:red; text-align:center;">Error: No se encontró la información del perfil del cliente.</p>
+            {% endif %}
+            
+            <a href="{% url 'cerrar_sesion' %}" class="btn-cerrar-sesion">
+                Cerrar Sesión
+            </a>
+            
+        </div>
+    </main>
+
+    <footer>
+        Copyright | Frutería Olivos Verdes
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const menu = document.getElementById('menu');
+
+        menuBtn.addEventListener('click', () => {
+            menu.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

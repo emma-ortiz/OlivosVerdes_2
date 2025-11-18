@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Compra | Olivos Verdes</title>
+    {% load static %}
+    <style>
+        body {
+            background-color: #1b120d;
+            color: #fff;
+            font-family: 'Verdana', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #1b120d;
+            padding: 20px;
+            color: #66842f;
+            font-size: 24px;
+            font-weight: bold;
+            width: 100%;
+        }
+        header img { height: 50px; margin-right: 10px; }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            width: 90%;
+            max-width: 900px;
+        }
+
+        h2 {
+            color: #ffce73;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        /* Contenedores Principales */
+        .contenedor-compra {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .seccion {
+            background-color: #241913;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Resumen de Artículos (Tabla) */
+        .resumen-articulos {
+            flex: 2; /* Ocupa más espacio */
+            min-width: 300px;
+        }
+
+        .resumen-articulos h3, .detalles-envio h3 {
+            color: #66842f;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .lista-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .lista-items li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #333;
+        }
+
+        .item-nombre {
+            color: #ddd;
+            font-size: 15px;
+        }
+
+        /* Detalles de Envío y Totales */
+        .detalles-envio {
+            flex: 1;
+            max-width: 350px;
+        }
+
+        .direccion-info, .totales-finales {
+            margin-bottom: 25px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #1b120d;
+        }
+
+        .direccion-info p strong {
+            color: #ffce73;
+        }
+
+        .totales-finales p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .totales-finales .total-final {
+            color: #ff4d4d;
+            font-size: 24px;
+            border-top: 2px solid #444;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .btn-pagar {
+            display: block;
+            width: 100%;
+            background-color: #ff4d4d; /* Rojo para destacar el pago */
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .btn-pagar:hover {
+            background-color: #e60000;
+        }
+
+        /* --- Barra Hamburguesa (Estilos ya conocidos) --- */
+        .hamburger-icon { display: block; position: fixed; top: 15px; right: 15px; z-index: 1000; background: none; border: none; font-size: 30px; cursor: pointer; color: #66842f; }
+        .menu-nav { position: fixed; top: 0; right: 0; width: 250px; height: 100%; background-color: #66842f; z-index: 999; transform: translateX(100%); transition: transform 0.3s ease-in-out; }
+        .menu-nav.active { transform: translateX(0); }
+        .menu-nav ul { list-style: none; padding: 70px 0 0 0; margin: 0; }
+        .menu-nav li a { display: block; padding: 15px 20px; text-decoration: none; color: white; border-bottom: 1px solid #555; }
+        .menu-nav li a:hover { background-color: #555; }
+        footer { background-color: #1b120d; color: #aaa; padding: 15px; font-size: 13px; text-align: center; margin-top: auto; width: 100%;}
+
+        @media (max-width: 768px) {
+            .contenedor-compra {
+                flex-direction: column;
+            }
+            .detalles-envio {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{% static 'app_fruteria/imagenes/icon.jpg' %}" alt="Logo">
+        Olivos Verdes
+    </header>
+
+    <button id="menu-btn" class="hamburger-icon">☰</button>
+    <nav id="menu" class="menu-nav">
+        <ul>
+            <li><a href="{% url 'inicio' %}">Inicio</a></li>
+            <li><a href="{% url 'menu_virtual' %}">Menú Virtual</a></li>
+            <li><a href="{% url 'ver_carrito' %}">Volver al Carrito</a></li>
+            <li><a href="{% url 'cerrar_sesion' %}">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h2>Confirmación de Pedido y Pago</h2>
+        
+        <div class="contenedor-compra">
+            
+            <div class="seccion resumen-articulos">
+                <h3>Artículos en tu pedido ({{ carrito_items|length }})</h3>
+                
+                <ul class="lista-items">
+                    {% for item in carrito_items %}
+                    <li>
+                        <span class="item-nombre">
+                            {{ item.producto.nombre }} (x{{ item.cantidad }} kg)
+                        </span>
+                        <span>${{ item.subtotal|floatformat:2 }}</span>
+                    </li>
+                    {% empty %}
+                    <li>Tu carrito está vacío. <a href="{% url 'menu_virtual' %}" style="color: #ffce73;">Añadir productos.</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="seccion detalles-envio">
+                
+                <h3>Detalles de Envío y Pago</h3>
+                
+                {% if perfil %}
+                <div class="direccion-info">
+                    <p><strong>Enviar a:</strong> {{ usuario.first_name }}</p>
+                    <p>{{ perfil.direccion_entrega }}</p>
+                    <p style="font-size: 14px; margin-top: 10px;">
+                        <a href="{% url 'perfil' %}" style="color: #ff4d4d; text-decoration: none;">(Cambiar dirección)</a>
+                    </p>
+                </div>
+                {% else %}
+                <div class="direccion-info">
+                    <p style="color: red;">🚨 Perfil incompleto. Por favor, actualiza tu perfil.</p>
+                </div>
+                {% endif %}
+                
+               <div class="totales-finales">
+                    <p>Subtotal de productos: ${{ total_general|floatformat:2 }}</p>
+                    <p>Costo de envío: $40.00</p>
+                    
+                    <p class="total-final">Total a Pagar: ${{ total_general|add:40|floatformat:2 }}</p>
+               </div>
+                
+                <form method="POST" action="{% url 'confirmar_compra' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-pagar">PAGAR ${{ total_general|add:40|floatformat:2 }}</button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        Copyright | Frutería Olivos Verdes
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const menu = document.getElementById('menu');
+        menuBtn.addEventListener('click', () => menu.classList.toggle('active'));
+    </script>
+</body>
+</html>
